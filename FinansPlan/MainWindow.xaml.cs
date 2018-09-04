@@ -36,6 +36,12 @@ namespace FinansPlan
             textBlock1.Text = $"Total: {total}  Available:{gett} / {ac.GetMaxCash(dat, false)[0].sum} ";
             listBox1.Items.Clear();
             foreach (var t in ac.Transactions.trans) listBox1.Items.Add(t);
+
+            var uni = new UnicreditAutoCredit();//DateTime.Parse("9.08.2018"), 233640.32, 24,11.3) 
+            uni.Recalc();
+            listBox1.Items.Clear();            
+            foreach (var t in uni.Transactions.trans) listBox1.Items.Add(t);
+            textBlock1.Text = $"Total: {uni.Transactions.trans.Sum(pp=>pp.sum)}";
         }
     }
 }
