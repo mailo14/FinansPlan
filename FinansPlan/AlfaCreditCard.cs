@@ -16,12 +16,15 @@ namespace FinansPlan
             end = start.AddYears(5).AddDays(-1);
             yearcommis = _yearcommis;
             Transactions = new TranList();
+            Claims = new List<Claim>();
 
             Recalc();
         }
-        public DateTime start, end; int yearcommis;
+        public DateTime start, end;
+       public int yearcommis;
         public double Limit {get; set;}
         public TranList Transactions { get; set; }
+        public List<Claim> Claims { get; set; }
 
         public double GetLimitOst(DateTime dat, bool noSdvig)
         {
@@ -71,6 +74,7 @@ namespace FinansPlan
         public void Recalc()
         {
             Transactions.ClearTempTrans();
+            Claims.Clear();
             var dat = start;
             if (Transactions.firstTranDat(start, ref dat))
             while (dat < end)
@@ -110,6 +114,9 @@ namespace FinansPlan
                                 {
                                     ezemecNeedSum -= ezemecPerPrihod;
                                     var t = Transactions.Add(endDatEzemec, ezemecNeedSum, 0, TranCat.addCash);
+                                    var c = new Claim(ezemecNeedSum, endDatEzemec, dat);
+                                    Claims.Add(c);
+                                    c.trans.Add(t);
                                     //sum += ezemecNeedSum;
                                     // if (-sum > Limit) t.error = "more than limit on " + (sum + Limit);
                                 }
@@ -121,6 +128,9 @@ namespace FinansPlan
                     if (sum < 0)
                     {
                         var t =Transactions.Add(endPerDat, -sum, 0,TranCat.addCash);
+                        var c = new Claim(-sum, endPerDat);
+                        Claims.Add(c);
+                        c.trans.Add(t);
                         sum = 0;//+= -sum;
                                 //if (-sum > limit) t.error = "more than limit on " + (sum + limit);
                         dat = endPerDat.AddDays(1);

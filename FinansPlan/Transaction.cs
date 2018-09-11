@@ -8,7 +8,7 @@ namespace FinansPlan
 {
     public class TranList
     {
-        public List<Tran> trans = new List<Tran>();
+       public List<Tran> trans = new List<Tran>();
         public Tran Add(DateTime _dat, double _sum, int type,TranCat cat)
         {
             int i = 0;
@@ -58,5 +58,18 @@ namespace FinansPlan
         getCash=0,
         payCard,
         addCash
+    }
+
+    public class Claim
+    {
+        DateTime? startDat;
+        public DateTime dat;
+        public double sum;
+        public Claim(double sum, DateTime endDat, DateTime? startDat=null)
+        {
+            this.dat = endDat;
+            this.sum = sum;
+        }
+        public List<Tran> trans = new List<Tran>();
     }
 }

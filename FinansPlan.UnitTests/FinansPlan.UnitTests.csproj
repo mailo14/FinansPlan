@@ -63,7 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountTests .cs" />
+    <Compile Include="AlfaAccountTests.cs" />
     <Compile Include="AnnuitetCreditTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
