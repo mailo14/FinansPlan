@@ -13,5 +13,12 @@ namespace FinansPlan
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            PlanHorizont = DateTime.Today.AddYears(1);
+        }
+    public static DateTime PlanHorizont;
     }
 }

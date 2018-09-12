@@ -22,5 +22,6 @@ namespace FinansPlan
         TranList Transactions { get; set; }
 
         IList<Tran> GetMaxCash(DateTime dateTime, bool noSdvig);
+        List<Claim> Claims { get; set; }
     }
 }

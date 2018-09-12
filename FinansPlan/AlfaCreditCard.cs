@@ -18,7 +18,7 @@ namespace FinansPlan
             Transactions = new TranList();
             Claims = new List<Claim>();
 
-            Recalc();
+           // Recalc();
         }
         public DateTime start, end;
        public int yearcommis;
