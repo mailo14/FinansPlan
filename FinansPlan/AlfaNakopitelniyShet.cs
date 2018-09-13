@@ -7,6 +7,14 @@ using System.Windows;
 
 namespace FinansPlan
 {
+    /*
+     открыв и пополнив на любую сумму, владелец получит 7% годовых на минимальный остаток на счете 
+     за период с 1-го месяца до 3-го месяца. С 4-го месяца ставка становится ниже, но остается весьма достойной — 5% 
+     годовых. Важный момент по поводу минимального остатка: имеется в виду именно минимальный остаток 
+     в период с 1-го по 3-й месяц. То есть, если вы сначала внесли 10000 рублей, а потом довнесли еще 20000 рублей, 
+     то проценты будут начисляться только на 10000 рублей как на минимальный остаток за этот период. 
+     С 4-го месяца минимальный остаток высчитывается помесячно. Это также следует учитывать и при снятии средств со счета.
+    */
     public class AlfaNakopitelniyShet : IAccount
     {        
         public AlfaNakopitelniyShet(DateTime _start,double initSum)//,double _procent= 7)
@@ -41,7 +49,7 @@ namespace FinansPlan
             Claims.Clear();
             var dat = start;
             double sum = 0;
-
+            double firstThreeMonthsMinSum =double.MaxValue;
             while (Transactions.firstTranDat(dat, ref dat))
             {
                 dat = new DateTime(dat.Year, dat.Month, start.Day);//TODO if 30/31/29
@@ -59,13 +67,19 @@ namespace FinansPlan
                     dat = dat.AddDays(1);
 
                 }
-                if (minMonthSum > 0)
+                if (minMonthSum != double.MaxValue)
                 {
-                    int monthSpend = (dat.Month - start.Month + 12) % 12;
-                    double procent = (monthSpend > 3 ? 4 : 7);
-                    double procentSum = minMonthSum*procenter.GetProcentSum(endPerDat.AddMonths(-1), 
-                        endPerDat, procent );
-                    var t = Transactions.Add(endPerDat, procentSum, 0, TranCat.addCash);
+                        int monthSpend = (dat.Month - start.Month + 12) % 12;
+                    if (monthSpend <= 3 )
+                        firstThreeMonthsMinSum = Math.Min(firstThreeMonthsMinSum, minMonthSum);
+                    if (minMonthSum > 0)
+                    {                        
+                            double procent = (monthSpend > 3 ? 4 : 7);
+                        double procentSum = (monthSpend > 3 ? minMonthSum : firstThreeMonthsMinSum)
+                            * procenter.GetProcentSum(endPerDat.AddMonths(-1),
+                            endPerDat, procent);
+                        var t = Transactions.Add(endPerDat, procentSum, 0, TranCat.addCash);
+                    }
                 }
                 if (dat >= App.PlanHorizont) break;
             }
