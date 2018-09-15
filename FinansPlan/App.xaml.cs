@@ -15,6 +15,16 @@ namespace FinansPlan
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            /* double s = 10000.0 - 10000.01;
+            s = Math.Round(s, 2);
+            decimal d = 10000.0m - 10000.01m;
+
+            if (d == -0.01m)
+                 MessageBox.Show("");
+            if (s == -0.01)
+                 MessageBox.Show("");
+             */
+
             base.OnStartup(e);
 
             PlanHorizont = DateTime.Today.AddYears(1);

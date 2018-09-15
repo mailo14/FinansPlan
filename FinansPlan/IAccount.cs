@@ -15,13 +15,13 @@ namespace FinansPlan
         /// <summary>
         /// Отстаток лимита на снятие на дату
         /// </summary>
-        double GetLimitOst(DateTime dateTime, bool noSdvig);
+        double GetLimitOst(DateTime dat, bool noSdvig);
 
-        double GetTotal(DateTime dateTime, bool onDayStart=false);
+        double GetTotal(DateTime dat, bool onDayStart=false);
 
         TranList Transactions { get; set; }
 
-        IList<Tran> GetMaxCash(DateTime dateTime, bool noSdvig);
+        IList<Tran> GetMaxCash(DateTime dat, bool noSdvig);
         List<Claim> Claims { get; set; }
     }
 }

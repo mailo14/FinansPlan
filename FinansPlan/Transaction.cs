@@ -13,7 +13,7 @@ namespace FinansPlan
         {
             int i = 0;
             while (i < trans.Count && trans[i].dat < _dat) i++;
-            Tran t = new Tran(_dat, _sum, type,cat);
+            Tran t = new Tran(_dat, Math.Round(_sum,2), type,cat);
             trans.Insert(i, t);
 
             return t;
