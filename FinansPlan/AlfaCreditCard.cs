@@ -14,35 +14,29 @@ namespace FinansPlan
      Также важно знать, что льготный срок отсчитывается со следующего дня после первой покупки. 
      А ежемесячные взносы нужно вносить в определенный платежный период: после 20 дней со дня заключения договора.
     */
-    public class AlfaCreditCard : IAccount
+    public class AlfaCreditCard : Account
     {
         public AlfaCreditCard(DateTime _start, int _yearcommis, int _limit = 200000)
+            :base(_start)
         {
             Limit = _limit;
-            start = _start;
-            end = start.AddYears(5).AddDays(-1);
+            End = Start.AddYears(5).AddDays(-1);
             yearcommis = _yearcommis;
-            Transactions = new TranList();
-            Claims = new List<Claim>();
 
            // Recalc();
         }
-        public DateTime start, end;
        public int yearcommis;
         public double Limit {get; set;}
-        public TranList Transactions { get; set; }
-        public List<Claim> Claims { get; set; }
 
         public double GetLimitOst(DateTime dat, bool noSdvig)
         {
-            int i = 0;
             var trans = this.Transactions.trans;
             double sum=GetTotal(dat);
             var min = sum;
             if (noSdvig==true)
-                while (Transactions.firstTranDat(dat, ref dat))                    
+                while (Transactions.FirstTranDat(dat, ref dat))                    
                 {
-                    var dayTrans = Transactions.tranPerDat(dat);
+                    var dayTrans = Transactions.TranPerDat(dat);
                     foreach (var ct in dayTrans)
                         sum += ct.sum;
                     if (sum < min) min = sum;
@@ -51,7 +45,7 @@ namespace FinansPlan
             return Limit+min;
         }
 
-        public IList<Tran> GetMaxCash(DateTime dat, bool noSdvig)
+        public override double GetMaxCash(DateTime dat, bool noSdvig)
         {
             //рсчет остатка месячного лимита на снятие без комиссии:
             var startDat = dat.Date.AddDays(-dat.Day + 1);
@@ -64,7 +58,7 @@ namespace FinansPlan
             double noKomisLimitOst =Math.Max(0, 50000-gets);
 
             var limitOst = GetLimitOst(dat, noSdvig);
-            var ret = new List<Tran>();
+           // var ret = new List<Tran>();
 
             double maxCash;
             //if (gets < limitOst)
@@ -72,42 +66,42 @@ namespace FinansPlan
                // if (noSdvig)
                 {
                     maxCash =Math.Min(noKomisLimitOst,limitOst);
-                    ret.Add(new Tran(dat, -maxCash, 0, TranCat.getCash));
+                    //ret.Add(new Tran(dat, -maxCash, 0, TranCat.getCash));
+                     return maxCash;
                 }
             }
-            return ret;
         }
 
         public void Recalc()
         {
             Transactions.ClearTempTrans();
             Claims.Clear();
-            var dat = start;
-            if (Transactions.firstTranDat(start, ref dat))
-            while (dat < end)
+            var dat = Start;
+            if (Transactions.FirstTranDat(Start, ref dat))
+            while (dat < End)
             {
                 Transactions.Add(dat, -yearcommis, 0,TranCat.payCard);
                 dat = dat.AddYears(1);
             }
-            dat = start;
+            dat = Start;
             double sum = 0;
-            while (dat < end)
+            while (dat < End)
             {
-                if (Transactions.firstTranDat(dat, ref dat))//есть транзакция начала периода
+                if (Transactions.FirstTranDat(dat, ref dat))//есть транзакция начала периода
                 {
                     var startPerDat = dat;
                     var endPerDat = dat.AddDays(100 );
-                    if (endPerDat > end) endPerDat = end;
+                    if (endPerDat > End) endPerDat = End.Value;
 
                     while (dat <= endPerDat)
                     {
-                        var dayTrans = Transactions.tranPerDat(dat);
+                        var dayTrans = Transactions.TranPerDat(dat);
                         foreach (var ct in dayTrans)
                         {
                             sum += ct.sum;
                             if (-sum > Limit) ct.error = "more than limit on " + (sum + Limit);
                         }
-                        if (dat > startPerDat && dat.Day == start.Day && sum<0 && dat!=endPerDat)
+                        if (dat > startPerDat && dat.Day == Start.Day && sum<0 && dat!=endPerDat)
                         {
                             var endDatEzemec = dat.AddDays(20);
                             if (endDatEzemec < endPerDat)
@@ -149,14 +143,6 @@ namespace FinansPlan
             if (sum != 0) MessageBox.Show(sum.ToString());
         }
 
-        public double GetTotal(DateTime dat, bool onDayStart = false)
-        {
-            var endDat = dat.Date;
-            if (!onDayStart) endDat = endDat.AddDays(1);
-            var sum=(from t in Transactions.trans where t.dat < endDat                         
-                         select t.sum).Sum();
-            return sum;
-        }
 
                 public Tran AddTran(DateTime dat, double sum, int type, TranCat cat)
                 {

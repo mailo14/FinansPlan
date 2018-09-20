@@ -27,15 +27,15 @@ namespace FinansPlan.UnitTests
 
             var firstThreeMonthsMinSum = sum;
             Assert.That(alfaNakopit.GetTotal(DateTime.Parse("1.02.2001"), true), Is.EqualTo(sum));
-            sum += firstThreeMonthsMinSum * 0.07 / 12;
+            sum =Math.Round(sum+ firstThreeMonthsMinSum * 0.07 / 12,2);
             Assert.That(alfaNakopit.GetTotal(DateTime.Parse("1.02.2001"), false), Is.EqualTo(sum));
 
-            sum += firstThreeMonthsMinSum * 0.07 / 12;
+            sum = Math.Round(sum + firstThreeMonthsMinSum * 0.07 / 12, 2);
             Assert.That(alfaNakopit.GetTotal(DateTime.Parse("1.03.2001"), false), Is.EqualTo(sum));
-            sum += firstThreeMonthsMinSum * 0.07 / 12;
+            sum = Math.Round(sum + firstThreeMonthsMinSum * 0.07 / 12, 2);
             Assert.That(alfaNakopit.GetTotal(DateTime.Parse("1.04.2001"), false), Is.EqualTo(sum));
 
-            sum += sum * 0.04 / 12;
+            sum = Math.Round(sum + sum* 0.04 / 12, 2);
             Assert.That(alfaNakopit.GetTotal(DateTime.Parse("1.05.2001"), false), Is.EqualTo(sum));
         }
 

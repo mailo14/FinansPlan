@@ -32,8 +32,8 @@ namespace FinansPlan
             ac.Recalc();
             var dat = DateTime.Parse("20.08.2018");//DateTime.Today
             var total = ac.GetTotal(dat);
-            var gett = ac.GetMaxCash(dat, true)[0].sum;
-            textBlock1.Text = $"Total: {total}  Available:{gett} / {ac.GetMaxCash(dat, false)[0].sum} ";
+            var gett = ac.GetMaxCash(dat, true);
+            textBlock1.Text = $"Total: {total}  Available:{gett} / {ac.GetMaxCash(dat, false)} ";
             listBox1.Items.Clear();
             foreach (var t in ac.Transactions.trans) listBox1.Items.Add(t);
 

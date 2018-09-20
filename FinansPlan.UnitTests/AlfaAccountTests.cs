@@ -48,16 +48,16 @@ namespace FinansPlan.UnitTests
         public void GetMaxCash_NoSdvig_ReturnCorrect()
         {
             var result = alfaAccount.GetMaxCash(DateTime.Parse("1.02.2018"), true);
-            Assert.That(-result[0].sum, Is.EqualTo(50000-500));
+            Assert.That(result, Is.EqualTo(50000-500));
        
             result = alfaAccount.GetMaxCash(DateTime.Parse("25.03.2018"), true);
-            Assert.That(-result[0].sum, Is.EqualTo(50000-1200-800-2600));
+            Assert.That(result, Is.EqualTo(50000-1200-800-2600));
         }
         [Test]
         public void GetMaxCash_CanSdvig_ReturnCorrect()
         {
             var result = alfaAccount.GetMaxCash(DateTime.Parse("25.03.2018"), false);
-            Assert.That(-result[0].sum, Is.EqualTo(50000-1200-800));
+            Assert.That(result, Is.EqualTo(50000-1200-800));
         }
     }
 

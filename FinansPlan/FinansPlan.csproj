@@ -67,6 +67,9 @@
     <Compile Include="AlfaNakopitelniyShet.cs" />
     <Compile Include="AnnuitetCredit.cs" />
     <Compile Include="BinbankVelikolepnayaSemerka.cs" />
+    <Compile Include="CashVallet.cs" />
+    <Compile Include="Claim.cs" />
+    <Compile Include="DefaultClaimSolver.cs" />
     <Compile Include="IProcenter.cs" />
     <Compile Include="Transaction.cs" />
     <Compile Include="UnicreditAutoCredit.cs" />
