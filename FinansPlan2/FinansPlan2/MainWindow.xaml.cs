@@ -22,184 +22,140 @@ namespace FinansPlan2
     {
         public MainWindow()
         {
+            DateTime dat = DateTime.Parse("1.08.19");
+            var a = new AlfaCredit100();
+            a.Start(dat);
+
+            List<string> states = new List<string>() { a.state };
+            while (true)
+            {                
+                dat=dat.AddDays(1);
+                a.curDat = dat;
+                a.DayStart(dat);
+                if (dat == DateTime.Parse("16.08.19"))
+                    a.AddSum(dat, 80m, true);
+
+                if (dat == DateTime.Parse("17.08.19"))
+                    a.AddSum(dat, 1500m, true);
+                a.DayEnd(dat);
+                states.Add(a.state);
+            }
+
             InitializeComponent();
         }
     }
-    public abstract class Dogovor
+
+    public class AlfaCredit100
     {
-        public List<Op> claims = new List<Op>();
+       public DateTime startDat;
+       public DateTime curDat;
+        decimal monthCashOst;
+        decimal debt;
+        decimal limit;
+        decimal limitOst;
+        decimal monthMinPay;
 
-        public List<Op> ops = new List<Op>();
-        public abstract void AnywayInEndOfDay(DateTime dat);
-        DateTime startDat { get; set; }
-        public Dogovor(DateTime dat, double sum = 0)
+        decimal balance;
+
+        DateTime? periodStart;
+        DateTime? periodEnd;
+
+        public string state { get { return ToString(); } }
+        public override string ToString()
         {
-            startDat = dat;
-            addOp(dat, sum);
-
+            return string.Join(", ",new object[] { curDat,balance,debt,limitOst, monthMinPay, periodStart , periodEnd });
         }
-        public void addOp(DateTime dat, double opSum)
+        public void Start(DateTime d)
         {
-            ops.Add(new Op(dat, opSum));
+            startDat = d;
+            curDat = d;
+            monthCashOst = 50000;
+            debt = 0;
+           limit =  limitOst = 200000;
+            monthMinPay = 0;
+            balance = 0;
 
-            var exist = osts.FirstOrDefault(pp => pp.dat == dat.Date);
-            if (exist != null)
-                exist.sum += opSum;
+            GetSum(curDat, 1490, false);
+        }
+
+        public bool GetSum(DateTime d, decimal sum, bool isCash)
+        {
+            if (sum <= limitOst)
+            {
+                if (isCash && sum > monthCashOst)
+                    throw new Exception("sum > monthCashOst");
+                balance -= sum;
+                if (balance < 0)
+                {
+                    if (debt == 0)
+                    {
+                        periodStart = d;
+                        periodEnd = d.AddDays(100);
+                        debt = -balance;
+                    }
+                    else
+                        debt += sum;
+                    limitOst = limit - debt;
+                }
+                if (isCash)
+                    monthCashOst -= sum;
+                return true;
+            }
+            else
+                throw new Exception("sum > limitOst");
+        }
+
+        public bool AddSum(DateTime d, decimal sum, bool isCash)
+        {
+            balance += sum;
+            if (debt > 0)
+            {
+                if (sum >= debt)
+                {
+                    debt = 0;
+                    limitOst = limit;
+                    monthMinPay = 0;
+                }
+                else
+                {
+                    debt -= sum;
+                    limitOst += sum;
+                    if (monthMinPay > 0)
+                    {
+                        if (sum >= monthMinPay)
+                            monthMinPay = 0;
+                        else monthMinPay -= sum;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public void DayStart(DateTime d)
+        {
+            if (d.Day == 1)
+                monthCashOst = 50000;
+            if (d.Day == monthMinPeriodStart)
+                monthMinPay = debt * 0.05m;
+            if (d.Day==startDat.Day && d.Month==startDat.Month && d.Year!=startDat.Year)
+                GetSum(d, 1490, false);
+        }
+        int monthMinPeriodStart=15, monthMinPeriodEnd=4;
+        public void DayEnd(DateTime d)
+        {
+            if (debt > 0)
+            {
+                if (d==periodEnd)
+                    throw new Exception("d==periodEnd "+debt);
+                if (monthMinPay>0 && d.Day== monthMinPeriodEnd)
+                    throw new Exception("d.Day== monthMinPeriodEnd " + monthMinPay);
+            }
             else
             {
-                var sum = sumOn(dat, false);
-                osts.Add(new Op(dat.Date, sum + opSum));
-            }
-        }
-
-        public List<Op> osts = new List<Op>();
-        public double sumOn(DateTime dat, bool onDayStart = false)
-        {
-            dat = dat.Date;
-            var limitDat = onDayStart ? dat : dat.AddDays(1);
-            //if (limitDat < this.startDat) throw new Exception();
-            var ret = (from o in osts
-                       where o.dat < limitDat
-                       orderby o.dat descending
-                       select o.sum).FirstOrDefault();
-            return ret;
-        }
-    }
-
-
-    public class Alfa : Dogovor
-    {
-        public Alfa(DateTime dat, double sum = 0) : base(dat, sum) { }
-        public List<IVariant> variants = new List<IVariant>();
-
-        public List<Op> ops = new List<Op>();
-        public override void AnywayInEndOfDay(DateTime dat)
-        {
-            var sum = sumOn(dat, false);
-            if (sum < 0) {
-                if (dat == srokEnd(dat)) {
-                    claims.Add(new Op(dat, -sum));
-                }
-            }
-        }
-        
-        DateTime? srokEnd(DateTime dat)
-        {
-            dat = dat.Date;
-            var sum = sumOn(dat);
-            if (sum >= 0) return null;
-                        
-            var prevPositiveOst = (from o in osts where o.sum>=0 && o.dat < dat orderby o.dat descending select o).First().dat;
-            var firstNegOstAfter= (from o in osts where o.dat > prevPositiveOst orderby o.dat ascending select o).First().dat;
-            if ((dat - firstNegOstAfter).TotalDays > 100) throw new Exception();
-            return firstNegOstAfter.AddDays(100);
-        }
-    }
-
-    public class TinkoffVklad : Dogovor
-    {
-        DateTime datTo;
-        public TinkoffVklad(DateTime dat, DateTime datTo, double sum = 0) : base(dat, sum) {
-            this.datTo = datTo;
-                }
-        // public List<IVariant> variants = new List<IVariant>();
-
-        public double proc = 7.22;
-        public List<Op> ops = new List<Op>();
-        public override void AnywayInEndOfDay(DateTime dat)
-        {
-            if (dat <= datTo)
-            {
-                var sum = sumOn(dat, true);
-                if (sum > 0)
-                {
-                    var procents = sum * proc / 100 / (DateTime.IsLeapYear(dat.Year) ? 366 : 365);
-                    addOp(dat, procents);
-                    sum += procents;
-                }
-            }
-            if (dat == datTo)
-                Close(dat);
-        }
-        public double GetMax(DateTime dat)//,double sum)
-        {
-            if (dat < datTo)
-            {
-                //max snyat без закрытия и убрать проценты
-
-                var sum = sumOn(dat, true);
-                if (sum > 50000)
-                {
-                    //pos
-                }
-            }
-        }
-        public void Close(DateTime dat)
-        {
-            if (dat >= datTo) ;//
-            if (dat < datTo)
-            {
-                
+                if (periodStart.HasValue)  
+                    periodStart = periodEnd = null;
             }
         }
     }
-
-    public class Halva: Dogovor
-    {
-        public Halva(DateTime dat, double sum = 0) : base(dat, sum) { }        
-        
-        public double proc = 6;
-        public override void AnywayInEndOfDay(DateTime dat) {
-            var sum = sumOn(dat, false);
-            if (sum > 0)
-            {
-                var procents = sum * proc / 100 / (DateTime.IsLeapYear(dat.Year) ? 366 : 365);
-                addOp(dat, procents);
-                sum += procents;
-            }
-        }
-       
-    }
-
-    public class VariantSnyatAlfaCashMax
-    {
-        public Dogovor dogovor;
-        public string name;
-        public VariantSnyatAlfaCashMax(Dogovor d)
-        {
-            this.dogovor = d;
-        }
-        public bool CanDo(DateTime dat)
-        { //Func<DateTime, bool> CanDo;
-
-            if (dat!=srokEnd(dat) && dogovor.sum > -200000)
-            {
-                var uzeSnytoVmecyace = 0;//TODO dogovor.ops
-                if (uzeSnytoVmecyace < 50000)
-                    return true;
-            }
-            return false;
-        }
-        public void Do(DateTime dat,Dogovor outDogovor)
-        {
-            var opSum = Math.Min(200000 + dogovor.sum, 50000);
-            dogovor.ops.Add(new Op(dat, -opSum));
-            dogovor.sum += -opSum;
-
-            outDogovor.ops.Add(new Op(dat, +opSum));
-            outDogovor.sum += +opSum;
-        }
-        
-    }
-
-    public class Op
-    {
-        public DateTime dat;
-        public double sum;
-        public Op(DateTime dat,double sum)
-        {
-            this.dat = dat;
-            this.sum = sum;
-        }
-    }
+   
 }
