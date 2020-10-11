@@ -61,6 +61,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DatedValueCollection.cs" />
+    <Compile Include="Helper.cs" />
+    <Compile Include="RevenueCalc.cs" />
+    <Compile Include="TaxStrategy.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

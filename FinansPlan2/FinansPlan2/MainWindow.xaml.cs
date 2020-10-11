@@ -23,6 +23,7 @@ namespace FinansPlan2
         public MainWindow()
         {
             DateTime dat = DateTime.Parse("1.08.19");
+            var di = (dat.AddDays(1) - dat).TotalDays;
             var a = new AlfaCredit100();
             a.Start(dat);
 

@@ -23,13 +23,13 @@ namespace FinansPlan2.Tests
                 EndDat = DateTime.Parse("05.04.2022"),
                 Period = 182
             };
-            o.Kupons = new DatedValueCollection(new List<DatedValue> {
-            new DatedValue("10.10.2017", 55.10M),
-            new DatedValue("09.04.2019", 55.60M),
-            new DatedValue("06.10.2020", 51.61M),
+            o.PlanKupons = new DatedValueCollection<decimal>(new List<DatedValue<decimal>> {
+            new DatedValue<decimal>("10.10.2017", 55.10M),
+            new DatedValue<decimal>("09.04.2019", 55.60M),
+            new DatedValue<decimal>("06.10.2020", 51.61M),
         });
-            o.Prices = new DatedValueCollection(new List<DatedValue> {
-                new DatedValue("1.08.10",1000)
+            o.Prices = new DatedValueCollection<decimal>(new List<DatedValue<decimal>> {
+                new DatedValue<decimal>("1.08.10",1000)
             });
              birja = new MOEX();
             birja.Obligs.Add(o);
