@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace FinansPlan2
 {
+    public class DatedDecimalCollection : DatedValueCollection<decimal>
+    {
+        public DatedDecimalCollection(List<DatedValue<decimal>> list) : base(list)
+        {
+        }
+    }
     public class DatedValueCollection<T> 
     {
         private List<DatedValue<T>> list;
@@ -17,7 +23,7 @@ namespace FinansPlan2
 
         public T GetValue(DateTime dat)
         {
-            var q = (from l in list where l.d >= dat orderby l.d select l).FirstOrDefault();
+            var q = (from l in list where l.d <= dat orderby l.d descending select l).FirstOrDefault();
             if (q == null) //throw new Exception("no val on dat");
                 q = list.Last();
             return q.v;

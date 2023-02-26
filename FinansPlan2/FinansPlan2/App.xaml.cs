@@ -13,5 +13,8 @@ namespace FinansPlan2
     /// </summary>
     public partial class App : Application
     {
+        public static Dictionary<string, IDogovor> Dogovors = new Dictionary<string, IDogovor>();
+        //public static CashVallet CashValletCurrent=
     }
+   
 }

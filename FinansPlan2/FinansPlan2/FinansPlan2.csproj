@@ -9,13 +9,14 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>FinansPlan2</RootNamespace>
     <AssemblyName>FinansPlan2</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -38,10 +39,45 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AngouriMath, Version=0.1.3.0, Culture=neutral, PublicKeyToken=bccdab90849ccf86, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngouriMath.1.3.0\lib\net472\AngouriMath.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr4.Runtime.Standard, Version=4.9.2.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr4.Runtime.Standard.4.9.2\lib\netstandard2.0\Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
+    <Reference Include="GenericTensor, Version=1.0.4.0, Culture=neutral, PublicKeyToken=419753575b7a4746, processorArchitecture=MSIL">
+      <HintPath>..\packages\GenericTensor.1.0.4\lib\net472\GenericTensor.dll</HintPath>
+    </Reference>
+    <Reference Include="HonkSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=384cc7619dfb9a7d, processorArchitecture=MSIL">
+      <HintPath>..\packages\HonkSharp.1.0.1\lib\net472\HonkSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="IndexRange, Version=1.0.0.0, Culture=neutral, PublicKeyToken=35e6a3c4212514c6, processorArchitecture=MSIL">
+      <HintPath>..\packages\IndexRange.1.0.0\lib\net471\IndexRange.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Solver.Foundation, Version=3.0.2.10889, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Solver.Foundation.3.1.0\lib\Microsoft.Solver.Foundation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Numbers, Version=1.8.0.0, Culture=neutral, PublicKeyToken=9cd62db60ea5554c, processorArchitecture=MSIL">
+      <HintPath>..\packages\PeterO.Numbers.1.8.0\lib\net40\Numbers.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -61,10 +97,40 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AlfaCreditCard.cs" />
+    <Compile Include="Claim.cs" />
+    <Compile Include="Class2 - Processor.cs" />
+    <Compile Include="Class2.cs" />
+    <Compile Include="Class3 -CashWallet.cs" />
+    <Compile Include="Class3 -Operations.cs" />
+    <Compile Include="Class3 -Raif.cs" />
+    <Compile Include="Class3 -Places.cs" />
+    <Compile Include="Class3 -VTB_Debit.cs" />
+    <Compile Include="Class3 -Zp.cs" />
+    <Compile Include="Class3 -Halva.cs" />
+    <Compile Include="CommandHotFix.cs" />
+    <Compile Include="CommandTickers.cs" />
+    <Compile Include="Error.cs" />
+    <Compile Include="HalvaCard.cs" />
+    <Compile Include="IDogovor.cs" />
+    <Compile Include="Operation.cs" />
+    <Compile Include="PayCommand.cs" />
+    <Compile Include="Products\TinkoffBlack\TinkoffBlack.cs" />
+    <Compile Include="Products\TinkoffBlack\TinkoffBlackGetCashAction.cs" />
+    <Compile Include="RashodRequest.cs" />
+    <Compile Include="SampleViewData\SampleViewModel.cs" />
+    <Compile Include="VTBZpAccount.cs" />
+    <Compile Include="WorkDayService.cs" />
+    <Compile Include="ZpVSK.cs" />
+    <Compile Include="CashVallet.cs" />
     <Compile Include="DatedValueCollection.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="IAccount.cs" />
+    <Compile Include="IActionCommand.cs" />
+    <Compile Include="ObjectCloner.cs" />
     <Compile Include="RevenueCalc.cs" />
     <Compile Include="TaxStrategy.cs" />
+    <Compile Include="Transaction.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -106,7 +172,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

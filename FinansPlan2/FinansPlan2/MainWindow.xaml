@@ -4,9 +4,202 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FinansPlan2"
+        xmlns:sample="clr-namespace:FinansPlan2.SampleViewData"
+    d:DataContext="{d:DesignInstance sample:SampleViewModel, IsDesignTimeCreatable=True}" 
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="763">
+
+    <Window.Resources>
+
+        <local:doubleToScaledConverter x:Key="convScaled" />
+    </Window.Resources>
     <Grid>
-        
+        <ItemsControl ItemsSource="{Binding DatElems}" Margin="3,3,3,0" VerticalAlignment="Top" Height="158">
+            
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Stretch" Margin="3" VerticalAlignment="Top" ShowGridLines="True"  >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="123*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock HorizontalAlignment="Left" Margin="3" TextWrapping="Wrap" Text="{Binding Dat,StringFormat=\{0:dd.MM.yy\}}" VerticalAlignment="Center"/>
+                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Ops}" Margin="3" VerticalAlignment="Top" VerticalContentAlignment="Top">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Grid.Column="1" HorizontalAlignment="Stretch"  Margin="3" VerticalAlignment="Top" ShowGridLines="True">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="25"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock TextWrapping="Wrap" Text="{Binding Text}" Margin="3" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Column="1" TextWrapping="Wrap" Text="{Binding Sum}" Margin="3" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" TextWrapping="Wrap" Text="{Binding Errors}" Margin="3" VerticalAlignment="Center"/>
+                                        <!--ItemsControl Grid.Column="3" ItemsSource="{Binding AccStateInfos}" Margin="3">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <Grid >
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                    </Grid>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Value}" Grid.Column="{Binding OrderNum}" Margin="0,0,5,5" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl-->
+                                        <ItemsControl Grid.Column="3" Height="18" ItemsSource="{Binding AccStateInfos}" Margin="3" Name="canvas1" BorderBrush="#FF1C1515" BorderThickness="1" 
+                                                      ClipToBounds="True"                        
+                              VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalAlignment="Center">
+                                            <ItemsControl.ItemContainerStyle>
+                                                <Style>
+                                                    <Setter Property="Canvas.Top" Value="0" />                                                    
+                                                    <Setter Property="Canvas.Left" Value="{Binding OrderNum,Converter={StaticResource convScaled},Mode=OneWay}" />
+                                                </Style>
+                                            </ItemsControl.ItemContainerStyle>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid ShowGridLines="True" Width="100" HorizontalAlignment="Stretch" 
+                                                          VerticalAlignment="Top"  Focusable="True" IsHitTestVisible="True" 
+                                                          Background="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}"
+                                                          >
+                                                        <TextBlock Text="{Binding Value}" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <!--Grid Focusable="False" HorizontalAlignment="Stretch" Background="Aqua" Height="20" /-->
+                                                    <Canvas Focusable="False" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                                        <!--Canvas.RenderTransform>
+                                                            <TranslateTransform X="{Binding ElementName=scrollBar1, Path=Value}"/>
+                                                        </>
+                                                        <Canvas.LayoutTransform>
+                                                            <ScaleTransform ScaleX="{Binding ElementName=scrollBar2, Path=Value}"/>
+                                                        </Canvas.LayoutTransform-->
+                                                    </Canvas>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                        </ItemsControl>
+
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <!--DataGrid Margin="3" Grid.Column="1"  MinHeight="203" AutoGenerateColumns="False" EnableRowVirtualization="True" HorizontalAlignment="Stretch" 
+                   RowDetailsVisibilityMode="VisibleWhenSelected" IsReadOnly="True" SelectionMode="Single" VerticalAlignment="Stretch" 
+                          
+                           ItemsSource="{Binding PersonList}"  MouseDoubleClick="ListView_MouseDoubleClick" KeyUp="PersonsListView_KeyUp" Sorting="PersonsListView_Sorting"
+                          >
+                <DataGrid.Columns>
+
+                    <DataGridTemplateColumn Width="auto">
+                        <DataGridTemplateColumn.Header>
+                            <CheckBox IsChecked="False" HorizontalAlignment="Center"/>
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="№" Binding="{Binding Index}" CellStyle="{StaticResource CenteredCell}"/>
+        </DataGrid.Columns>
+                </DataGrid-->
+
+
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <ItemsControl ItemsSource="{Binding DatElems}" Margin="10,207,-4,0" VerticalAlignment="Top">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="1" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Left" Margin="3" VerticalAlignment="Top" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="123*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock HorizontalAlignment="Left" Margin="3" TextWrapping="Wrap" Text="{Binding Dat, StringFormat=\{0:dd.MM.yy\}}" VerticalAlignment="Center"/>
+                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Ops}" Margin="3" VerticalAlignment="Top">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="1" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Grid.Column="1" HorizontalAlignment="Left"  Margin="3" VerticalAlignment="Top" >
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock TextWrapping="Wrap" Text="{Binding Text}" Margin="3"/>
+                                        <TextBox Grid.Column="1" TextWrapping="Wrap" Text="{Binding Sum}" Margin="3"/>
+                                        <TextBlock Grid.Column="2" TextWrapping="Wrap" Text="{Binding Errors}" Margin="3"/>
+                                        <ItemsControl Grid.Column="3" ItemsSource="{Binding AccStateInfos}" Margin="3">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <UniformGrid Rows="1" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding ''}" Margin="0,0,5,5" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <!--DataGrid Margin="3" Grid.Column="1"  MinHeight="203" AutoGenerateColumns="False" EnableRowVirtualization="True" HorizontalAlignment="Stretch" 
+                   RowDetailsVisibilityMode="VisibleWhenSelected" IsReadOnly="True" SelectionMode="Single" VerticalAlignment="Stretch" 
+                          
+                           ItemsSource="{Binding PersonList}"  MouseDoubleClick="ListView_MouseDoubleClick" KeyUp="PersonsListView_KeyUp" Sorting="PersonsListView_Sorting"
+                          >
+                <DataGrid.Columns>
+
+                    <DataGridTemplateColumn Width="auto">
+                        <DataGridTemplateColumn.Header>
+                            <CheckBox IsChecked="False" HorizontalAlignment="Center"/>
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="№" Binding="{Binding Index}" CellStyle="{StaticResource CenteredCell}"/>
+        </DataGrid.Columns>
+                </DataGrid-->
+
+
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <UniformGrid Columns="3" HorizontalAlignment="Left" Height="66" Margin="215,142,0,0" VerticalAlignment="Top" Width="365" Background="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+            <TextBlock Text="gfghfg"/>
+            <TextBlock Text="gfghfg" Grid.Column="3"/>
+        </UniformGrid>
+        <ScrollBar Height="11" Margin="3,191,3,0" VerticalAlignment="Top"
+                   Name="scrollBar1" Orientation="Horizontal" Maximum="0" Minimum="0" SmallChange="10" LargeChange="30" Value="0" FlowDirection="RightToLeft"/>
     </Grid>
 </Window>
