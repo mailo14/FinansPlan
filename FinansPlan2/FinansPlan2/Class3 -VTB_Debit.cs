@@ -75,7 +75,7 @@ namespace FinansPlan2.New
             initState.Dat = startDate; initState.InitialEvent = request.eventtt;
             initState.Sum = paramss.Sum ?? 0m;
 
-            request.context.DogovorLines.Add(line.LineName, line);
+            request.strategyBranch.DogovorLines.Add(line.LineName, line);
             request.DogovorLinesStates.Add(line.LineName, initState);
         }
     }
@@ -121,7 +121,7 @@ namespace FinansPlan2.New
 
         public /*override*/ void InnerExecute(ExecuteRequest request, IDogovorLineState inputNewState)
         {
-            var line = request.context.DogovorLines[request.itemDogovorLineName] as DogovorLine;
+            var line = request.strategyBranch.DogovorLines[request.itemDogovorLineName] as DogovorLine;
             var dogovor = (VTB_DebitDogovor)line.Dogovorr;
             var newState = inputNewState as VTB_DebitDogovorLineState;
             var dat = request.eventtt.Dat;
@@ -171,7 +171,7 @@ namespace FinansPlan2.New
         public void Execute(ExecuteRequest request)
         {
             var lineName = request.itemDogovorLineName;
-            var line = request.context.DogovorLines[lineName] as DogovorLine;
+            var line = request.strategyBranch.DogovorLines[lineName] as DogovorLine;
             var dat = request.eventtt.Dat;
 
             var state = request.DogovorLinesStates[lineName] as VTB_DebitDogovorLineState;

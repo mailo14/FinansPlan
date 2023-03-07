@@ -91,7 +91,7 @@ Limit = new DatedDecimalCollection(new List<DatedValue<decimal>> { new DatedValu
             }
             initState.AvailableToGet = line.Limit.GetValue(startDate)+initState.Sum;
 
-            request.context.DogovorLines.Add(line.LineName, line);
+            request.strategyBranch.DogovorLines.Add(line.LineName, line);
             request.DogovorLinesStates.Add(line.LineName, initState);
         }
     }
@@ -144,7 +144,7 @@ Limit = new DatedDecimalCollection(new List<DatedValue<decimal>> { new DatedValu
 
         public void Execute(ExecuteRequest request)
         {
-            var line = request.context.DogovorLines[request.itemDogovorLineName] as RaifDogovorLine;
+            var line = request.strategyBranch.DogovorLines[request.itemDogovorLineName] as RaifDogovorLine;
             var dat = request.eventtt.Dat;
 
             var state = request.DogovorLinesStates[line.LineName] as RaifDogovorLineState;
@@ -207,7 +207,7 @@ Limit = new DatedDecimalCollection(new List<DatedValue<decimal>> { new DatedValu
 
         public void Execute(ExecuteRequest request)
         {
-            var line = request.context.DogovorLines[request.itemDogovorLineName] as RaifDogovorLine;
+            var line = request.strategyBranch.DogovorLines[request.itemDogovorLineName] as RaifDogovorLine;
             var dat = request.eventtt.Dat;
 
             var state = request.DogovorLinesStates[line.LineName] as RaifDogovorLineState;
@@ -256,7 +256,7 @@ Limit = new DatedDecimalCollection(new List<DatedValue<decimal>> { new DatedValu
             var response = new CanResponse { Success = true, MaxSum = decimal.MaxValue };
            
             var lineName = request.itemDogovorLineName;
-            var line = request.context.DogovorLines[lineName] as RaifDogovorLine;
+            var line = request.strategyBranch.DogovorLines[lineName] as RaifDogovorLine;
             var dat = request.eventtt.Dat;
            
             var state = request.DogovorLinesStates[request.itemDogovorLineName] as RaifDogovorLineState;
@@ -287,7 +287,7 @@ Limit = new DatedDecimalCollection(new List<DatedValue<decimal>> { new DatedValu
         public void Execute(ExecuteRequest request)
         {
             var lineName = request.itemDogovorLineName;
-            var line =request.context.DogovorLines[lineName] as RaifDogovorLine;
+            var line =request.strategyBranch.DogovorLines[lineName] as RaifDogovorLine;
             var dat = request.eventtt.Dat;
 
             var state = request.DogovorLinesStates[lineName] as RaifDogovorLineState;
@@ -341,7 +341,7 @@ Limit = new DatedDecimalCollection(new List<DatedValue<decimal>> { new DatedValu
         public void Execute(ExecuteRequest request)
         {
             var lineName = request.itemDogovorLineName;
-            var line = request.context.DogovorLines[lineName] as RaifDogovorLine; 
+            var line = request.strategyBranch.DogovorLines[lineName] as RaifDogovorLine; 
             var dat = request.eventtt.Dat;
 
             var state = request.DogovorLinesStates[lineName] as RaifDogovorLineState;

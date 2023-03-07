@@ -126,7 +126,7 @@ namespace FinansPlan2.New
 
             //line.DogovorLineStates.Add(initState);
 
-            request.context.DogovorLines.Add(line.LineName, line);
+            request.strategyBranch.DogovorLines.Add(line.LineName, line);
             request.DogovorLinesStates.Add(line.LineName, initState);
         }
     }
@@ -159,7 +159,7 @@ namespace FinansPlan2.New
 
         public void Execute(ExecuteRequest request)
         {
-            var line =request.context.DogovorLines[request.itemDogovorLineName];
+            var line =request.strategyBranch.DogovorLines[request.itemDogovorLineName];
             var dat = request.eventtt.Dat;
 
             var state = request.DogovorLinesStates[line.LineName] as ZpDogovorLineState;
@@ -190,13 +190,13 @@ namespace FinansPlan2.New
             if (sum > 0)
             {
                 decimal? sumBeforeCorrection = null;
-                var correction = request.context.Corrections.SingleOrDefault(x => x.Dat == dat && x.DogovorLineName == line.LineName && x.OpType == OpType.PayZp);
+                var correction = request.strategyBranch.Corrections.SingleOrDefault(x => x.Dat == dat && x.DogovorLineName == line.LineName && x.OpType == OpType.PayZp);
                 if (correction != null)
                 {
                     sumBeforeCorrection = sum;
                     sum = correction.Sum;
                 }
-                var zpLine = request.context.DogovorLines[dogovor.ZpAccountDogovorLineName];
+                var zpLine = request.strategyBranch.DogovorLines[dogovor.ZpAccountDogovorLineName];
                 var zpAccState = request.DogovorLinesStates[zpLine.LineName] as ZpDogovorLineState;
 
 

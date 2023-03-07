@@ -68,7 +68,7 @@ namespace FinansPlan2.New
             initState.Sum = paramss.Sum ?? 0m;
             //line.DogovorLineStates.Add(initState);
 
-            request.context.DogovorLines.Add(line.LineName, line);
+            request.strategyBranch.DogovorLines.Add(line.LineName, line);
             request.DogovorLinesStates.Add(line.LineName, initState);
         }
     }

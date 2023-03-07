@@ -17,7 +17,7 @@ namespace FinansPlan2.New
         //public Func<OperationCanExecuteRequest, OperationCanExecuteResponse> CanExecute;
         public virtual OperationCanExecuteResponse CanExecute(OperationCanExecuteRequest req)
         {
-            var line = req.Context.DogovorLines[req.DogLine1Id];
+            var line = req.strategyBranch.DogovorLines[req.DogLine1Id];
             var line1Action = line.Dogovorr.AvailableActions.SingleOrDefault(d => d.Type == ActionForD1);
             if (line1Action != null)
             {
@@ -26,7 +26,7 @@ namespace FinansPlan2.New
                 //    if (state1.)
                 if (ActionForD2.HasValue)
                 {
-                    var dogLines2 = req.Context.DogovorLines.Values.Where(l => l != line && l.Dogovorr.AvailableActions.Any(d => d.Type == ActionForD2)).ToList();
+                    var dogLines2 = req.strategyBranch.DogovorLines.Values.Where(l => l != line && l.Dogovorr.AvailableActions.Any(d => d.Type == ActionForD2)).ToList();
                     if (dogLines2.Any())
                     {
 
@@ -93,8 +93,8 @@ namespace FinansPlan2.New
                 ActionForD1=ActionnType.PutCash,ActionForD2=ActionnType.GetCash},*/
         };
 
-        public bool CanRunForManualGen { get; set; } = true;//отображать в возможных действиях на юи
-        public bool CanRunForAutoGen { get; set; } = true;//разрешить оперировать действием при автогенерации вариантов
+        public bool CanAddForManual { get; set; } = true;//отображать в возможных действиях на юи
+        public bool CanAddForAutoGen { get; set; } = true;//разрешить оперировать действием при автогенерации вариантов
 
         /*public CanResponse CanExecute(Dogovor d1, Dogovor d2, decimal sum)
         {
@@ -134,7 +134,7 @@ namespace FinansPlan2.New
         public override OperationCanExecuteResponse CanExecute(OperationCanExecuteRequest req)
         {
             if (req.DogLine1Id != StandardDogLineName.CashWallet
-            && req.Context.DogovorLines.ContainsKey(StandardDogLineName.CashWallet))
+            && req.strategyBranch.DogovorLines.ContainsKey(StandardDogLineName.CashWallet))
             {
                 return new OperationCanExecuteResponse { Success = true, DogLines2 = new List<string> { StandardDogLineName.CashWallet } };
             }
@@ -159,10 +159,13 @@ namespace FinansPlan2.New
             Name = "Выплата зарплаты";
             Typ = OpType.PayZp;
             ActionForD1 = ActionnType.PutBeznal;
+
+            CanAddForAutoGen = false;
+            CanAddForManual = false;
         }
         public override OperationCanExecuteResponse CanExecute(OperationCanExecuteRequest req)
         {
-            var zpAccLines = req.Context.DogovorLines.Values.Where(l => l.Dogovorr.Typee == DogovorType.Zp)
+            var zpAccLines = req.strategyBranch.DogovorLines.Values.Where(l => l.Dogovorr.Typee == DogovorType.Zp)
                 .Select(x => (x.Dogovorr as ZpDogovor).ZpAccountDogovorLineName).ToList();
 
             return new OperationCanExecuteResponse { Success = zpAccLines.Contains(req.DogLine1Id) };
@@ -175,10 +178,13 @@ namespace FinansPlan2.New
             Name = "Выплата процентов";//а на остаток";
             Typ = OpType.PayProcents;
             ActionForD1 = ActionnType.PutBeznal;
+
+            CanAddForAutoGen = false;
+            CanAddForManual = false;
         }
         public override OperationCanExecuteResponse CanExecute(OperationCanExecuteRequest req)
         {
-            var zpAccLines = req.Context.DogovorLines.Values.Where(l => l.LineName == StandardDogLineName.Halva || l.Dogovorr.Typee == DogovorType.Vklad)
+            var zpAccLines = req.strategyBranch.DogovorLines.Values.Where(l => l.LineName == StandardDogLineName.Halva || l.Dogovorr.Typee == DogovorType.Vklad)
                 .Select(x => x.LineName).ToList();
 
             return new OperationCanExecuteResponse { Success = zpAccLines.Contains(req.DogLine1Id) };
@@ -196,6 +202,7 @@ namespace FinansPlan2.New
         public Contextt Context { get; set; }
         public DateTime Dat { get; set; }
         public string DogLine1Id { get; set; }
+        public StrategyBranch strategyBranch { get; set; }
     }
 
 

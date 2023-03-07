@@ -30,7 +30,8 @@ namespace FinansPlan2.Tests
             Fixture.Inject<IWorkDayService>(new WorkDayService(workDayProviderMock.Object));
 
 
-            var context = new Contextt();
+            var context = new Contextt();                        
+            context.StrategyBranches.Add(new StrategyBranch());
 
             var zp = Fixture.Freeze<ZpDogovor>(c => c.OmitAutoProperties());
             zp.ZpAccountDogovorLineName = StandardDogLineName.ZpVtbKarta;
@@ -47,7 +48,7 @@ namespace FinansPlan2.Tests
                 ItemAction = ActionnType.Open,
                 Params = new OpenDogovorParams { LineName = StandardDogLineName.ZpVtbKarta }
             });
-            context.Events.Add(event1);
+            context.StrategyBranches.Single().Events.Add(event1);
 
             event1 = new Eventt { Dat = DateTime.Parse("1.09.2022"), Name = "Добавить карту ВТБ зарплатная" };
             event1.ActionItems.Add(new ActionnItem
@@ -57,10 +58,10 @@ namespace FinansPlan2.Tests
                 ItemAction = ActionnType.Open,
                 Params = new OpenDogovorParams { LineName = StandardDogLineName.ZpVtbKarta }
             });
-            context.Events.Add(event1);
+            context.StrategyBranches.Single().Events.Add(event1);
 
-            context.PeriodStart = context.Events.Min(x => x.Dat);
-            context.PeriodEnd = context.Events.Max(x => x.Dat).AddDays(5);
+            context.PeriodStart = context.StrategyBranches.Single().Events.Min(x => x.Dat);
+            context.PeriodEnd = context.StrategyBranches.Single().Events.Max(x => x.Dat).AddDays(5);
 
             return context;
         }
@@ -72,10 +73,10 @@ namespace FinansPlan2.Tests
 
             Processor.ProcessPeriod(context);
 
-            var actual = context.InitDatedScope; while (actual.Next != null) actual = actual.Next;
+            var actual = context.StrategyBranches.Single().LastEventState;
 
-            Assert.AreEqual(2, context.DogovorLines.Count);
-            var state = actual.DayEventStates.Last().DogovorLineStates[StandardDogLineName.ZpVtbKarta] as VTB_DebitDogovorLineState; 
+            Assert.AreEqual(2, context.StrategyBranches.Single().DogovorLines.Count);
+            var state = actual.DogovorLineStates[StandardDogLineName.ZpVtbKarta] as VTB_DebitDogovorLineState; 
             Assert.AreEqual(70500, state.Sum);
 
             //var actual = context.InitDatedScope;
@@ -87,14 +88,14 @@ namespace FinansPlan2.Tests
         public void CalcZpSumWithZpCorrection(decimal corrSum)
         {
             var context = GetContext(null);
-            context.Corrections.Add(new Correction { Dat = DateTime.Parse("5.09.2022"), DogovorLineName = "Zp", OpType = OpType.PayZp, Sum = corrSum });
+            context.StrategyBranches.Single().Corrections.Add(new Correction { Dat = DateTime.Parse("5.09.2022"), DogovorLineName = "Zp", OpType = OpType.PayZp, Sum = corrSum });
 
             Processor.ProcessPeriod(context);
 
-            var actual = context.InitDatedScope; while (actual.Next != null) actual = actual.Next;
+            var actual = context.StrategyBranches.Single().LastEventState;
 
-            Assert.AreEqual(2, context.DogovorLines.Count);
-            var state = actual.DayEventStates.Last().DogovorLineStates[StandardDogLineName.ZpVtbKarta] as VTB_DebitDogovorLineState; 
+            Assert.AreEqual(2, context.StrategyBranches.Single().DogovorLines.Count);
+            var state = actual.DogovorLineStates[StandardDogLineName.ZpVtbKarta] as VTB_DebitDogovorLineState; 
             Assert.AreEqual(corrSum, state.Sum);
         }
 
@@ -104,16 +105,16 @@ namespace FinansPlan2.Tests
         public void CalcZpAndAvansSumWithZpCorrection(decimal corrSum)
         {
             var context = GetContext(null);
-            context.Corrections.Add(new Correction { Dat = DateTime.Parse("5.09.2022"), DogovorLineName = "Zp", OpType = OpType.PayZp, Sum = corrSum });
+            context.StrategyBranches.Single().Corrections.Add(new Correction { Dat = DateTime.Parse("5.09.2022"), DogovorLineName = "Zp", OpType = OpType.PayZp, Sum = corrSum });
 
             context.PeriodEnd = DateTime.Parse("30.09.2022");
             Processor.ProcessPeriod(context);
 
-            var actual = context.InitDatedScope; while (actual.Next != null) actual = actual.Next;
+            var actual = context.StrategyBranches.Single().LastEventState;
 
             var avans = 60000;
-            Assert.AreEqual(2, context.DogovorLines.Count);
-            var state = actual.DayEventStates.Last().DogovorLineStates[StandardDogLineName.ZpVtbKarta] as VTB_DebitDogovorLineState; 
+            Assert.AreEqual(2, context.StrategyBranches.Single().DogovorLines.Count);
+            var state = actual.DogovorLineStates[StandardDogLineName.ZpVtbKarta] as VTB_DebitDogovorLineState; 
             Assert.AreEqual(corrSum+ avans, state.Sum);
         }
 
@@ -121,12 +122,12 @@ namespace FinansPlan2.Tests
         public void PrintTmp()
         {
             var context = GetContext(null);
-            context.Corrections.Add(new Correction { Dat = DateTime.Parse("5.09.2022"), DogovorLineName = "Zp", OpType = OpType.PayZp, Sum = 100000 });
+            context.StrategyBranches.Single().Corrections.Add(new Correction { Dat = DateTime.Parse("5.09.2022"), DogovorLineName = "Zp", OpType = OpType.PayZp, Sum = 100000 });
 
             context.PeriodEnd = DateTime.Parse("30.09.2022");
             Processor.ProcessPeriod(context);
 
-            //var actual = context.InitDatedScope; while (actual.Next != null) actual = actual.Next;
+            //var actual = context.StrategyBranches.Single().LastEventState;
 
             Processor.Print(context);
         }
@@ -167,6 +168,7 @@ namespace FinansPlan2.Tests
         public void PerevodTest()
         {            
             var context = new Contextt();
+            context.StrategyBranches.Add(new StrategyBranch());
 
             var vtbDebit = new VTB_DebitDogovor();
             context.Dogovors.Add(vtbDebit.Name, vtbDebit);
@@ -184,7 +186,7 @@ namespace FinansPlan2.Tests
                 ItemAction = ActionnType.Open,
                 Params = new OpenDogovorParams { LineName = StandardDogLineName.ZpVtbKarta }
             });
-            context.Events.Add(event1);
+            context.StrategyBranches.Single().Events.Add(event1);
 
              event1 = new Eventt { Dat = DateTime.Parse("1.09.2022"), Name = "Добавить карту raif " };
             event1.ActionItems.Add(new ActionnItem
@@ -194,7 +196,7 @@ namespace FinansPlan2.Tests
                 ItemAction = ActionnType.Open,
                 Params = new OpenDogovorParams { LineName = "raif" ,Limit=150000}
             });
-            context.Events.Add(event1);
+            context.StrategyBranches.Single().Events.Add(event1);
 
             event1 = new Eventt { Dat = DateTime.Parse("1.09.2022"), Name = "Добавить кошелек" };
             event1.ActionItems.Add(new ActionnItem
@@ -204,7 +206,7 @@ namespace FinansPlan2.Tests
                 ItemAction = ActionnType.Open,
                 Params = new OpenDogovorParams {Sum=1000 }
             });
-            context.Events.Add(event1);
+            context.StrategyBranches.Single().Events.Add(event1);
 
             var sum = 300;
 
@@ -213,10 +215,10 @@ namespace FinansPlan2.Tests
                 DogLine2Id=  StandardDogLineName.ZpVtbKarta,
                 Summ = sum });            
                         
-            context.Events.Add(event1);
+            context.StrategyBranches.Single().Events.Add(event1);
 
-            context.PeriodStart = context.Events.Min(x => x.Dat);
-            context.PeriodEnd = context.Events.Max(x => x.Dat);//.AddDays(1);
+            context.PeriodStart = context.StrategyBranches.Single().Events.Min(x => x.Dat);
+            context.PeriodEnd = context.StrategyBranches.Single().Events.Max(x => x.Dat);//.AddDays(1);
 
             Processor.ProcessPeriod(context);
 
@@ -227,6 +229,7 @@ namespace FinansPlan2.Tests
         public void SnyatCashPopolnitFromCashTest()
         {
             var context = new Contextt();
+            context.StrategyBranches.Add(new StrategyBranch());
 
             var vtbDebit = new VTB_DebitDogovor();
             context.Dogovors.Add(vtbDebit.Name, vtbDebit);
@@ -242,7 +245,7 @@ namespace FinansPlan2.Tests
                 ItemAction = ActionnType.Open,
                 Params = new OpenDogovorParams { LineName = StandardDogLineName.ZpVtbKarta,Sum=300 }
             });
-            context.Events.Add(event1);
+            context.StrategyBranches.Single().Events.Add(event1);
 
             event1 = new Eventt { Dat = DateTime.Parse("1.09.2022"), Name = "Добавить кошелек" };
             event1.ActionItems.Add(new ActionnItem
@@ -252,7 +255,7 @@ namespace FinansPlan2.Tests
                 ItemAction = ActionnType.Open,
                 Params = new OpenDogovorParams { Sum = 100 }
             });
-            context.Events.Add(event1);
+            context.StrategyBranches.Single().Events.Add(event1);
 
 
             event1 = New.Operation.BuidEvent(new BuidEventFromOpRequest
@@ -262,7 +265,7 @@ namespace FinansPlan2.Tests
                 DogLine1Id = StandardDogLineName.ZpVtbKarta,
                 Summ = 200
             });
-            context.Events.Add(event1);
+            context.StrategyBranches.Single().Events.Add(event1);
 
             event1 = New.Operation.BuidEvent(new BuidEventFromOpRequest
             {
@@ -271,10 +274,10 @@ namespace FinansPlan2.Tests
                 DogLine1Id = StandardDogLineName.ZpVtbKarta,
                 Summ = 250
             });
-            context.Events.Add(event1);
+            context.StrategyBranches.Single().Events.Add(event1);
 
-            context.PeriodStart = context.Events.Min(x => x.Dat);
-            context.PeriodEnd = context.Events.Max(x => x.Dat);//.AddDays(1);
+            context.PeriodStart = context.StrategyBranches.Single().Events.Min(x => x.Dat);
+            context.PeriodEnd = context.StrategyBranches.Single().Events.Max(x => x.Dat);//.AddDays(1);
 
             Processor.ProcessPeriod(context);
 

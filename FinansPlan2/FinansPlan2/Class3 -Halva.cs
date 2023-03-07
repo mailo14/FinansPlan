@@ -92,7 +92,7 @@ namespace FinansPlan2.New
             initState.Dat = startDate; initState.InitialEvent = request.eventtt;
             initState.Sum = paramss.Sum ?? 0m;
 
-            request.context.DogovorLines.Add(line.LineName, line);
+            request.strategyBranch.DogovorLines.Add(line.LineName, line);
             request.DogovorLinesStates.Add(line.LineName, initState);
         }
     }
@@ -132,7 +132,7 @@ namespace FinansPlan2.New
 
         public void Execute0(ExecuteRequest request)
         {
-            var line = request.context.DogovorLines[request.itemDogovorLineName] as HalvaDogovorLine;
+            var line = request.strategyBranch.DogovorLines[request.itemDogovorLineName] as HalvaDogovorLine;
             var dogovor = (HalvaDogovor)line.Dogovorr;
 
             var dat = request.eventtt.Dat;
@@ -148,7 +148,7 @@ namespace FinansPlan2.New
 
             if (dat.Day == line.PeriodStartDay)
             {
-                var correction = request.context.Corrections.SingleOrDefault(x => x.Dat == dat && x.DogovorLineName == line.LineName && x.OpType == OpType.PayProcents);
+                var correction = request.strategyBranch.Corrections.SingleOrDefault(x => x.Dat == dat && x.DogovorLineName == line.LineName && x.OpType == OpType.PayProcents);
 
                 if (newState.ProcentsNakopl > 0 || correction != null)
                 {
@@ -209,7 +209,7 @@ namespace FinansPlan2.New
 
         public /*override*/ void InnerExecute(ExecuteRequest request, IDogovorLineState inputNewState)
         {
-            var line = request.context.DogovorLines[request.itemDogovorLineName] as HalvaDogovorLine;
+            var line = request.strategyBranch.DogovorLines[request.itemDogovorLineName] as HalvaDogovorLine;
             var dogovor = (HalvaDogovor)line.Dogovorr;
             var newState = inputNewState as HalvaDogovorLineState;
             var dat = request.eventtt.Dat;
@@ -222,7 +222,7 @@ namespace FinansPlan2.New
 
             if (dat.Day == line.PeriodStartDay)
             {
-                var correction = request.context.Corrections.SingleOrDefault(x => x.Dat == dat && x.DogovorLineName == line.LineName && x.OpType == OpType.PayProcents);
+                var correction = request.strategyBranch.Corrections.SingleOrDefault(x => x.Dat == dat && x.DogovorLineName == line.LineName && x.OpType == OpType.PayProcents);
 
                 if (newState.ProcentsNakopl > 0 || correction != null)
                 {
@@ -296,7 +296,7 @@ namespace FinansPlan2.New
         public void Execute(ExecuteRequest request)
         {
             var lineName = request.itemDogovorLineName;
-            var line = request.context.DogovorLines[lineName] as HalvaDogovorLine;
+            var line = request.strategyBranch.DogovorLines[lineName] as HalvaDogovorLine;
             var dat = request.eventtt.Dat;
 
             var state = request.DogovorLinesStates[lineName] as HalvaDogovorLineState;
@@ -358,7 +358,7 @@ namespace FinansPlan2.New
         public void Execute(ExecuteRequest request)
         {
             var lineName = request.itemDogovorLineName;
-            var line = request.context.DogovorLines[lineName] as HalvaDogovorLine;
+            var line = request.strategyBranch.DogovorLines[lineName] as HalvaDogovorLine;
             var dat = request.eventtt.Dat;
 
             var state = request.DogovorLinesStates[lineName] as HalvaDogovorLineState;
@@ -412,7 +412,7 @@ namespace FinansPlan2.New
         public void Execute(ExecuteRequest request)
         {
             var lineName = request.itemDogovorLineName;
-            var line = request.context.DogovorLines[lineName] as HalvaDogovorLine;
+            var line = request.strategyBranch.DogovorLines[lineName] as HalvaDogovorLine;
             var dat = request.eventtt.Dat;
 
             var state = request.DogovorLinesStates[lineName] as HalvaDogovorLineState;

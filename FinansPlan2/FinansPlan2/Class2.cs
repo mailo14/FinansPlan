@@ -11,15 +11,30 @@ namespace FinansPlan2.New
     public class Contextt
     {
         public Dictionary<string, Dogovor> Dogovors=new Dictionary<string, Dogovor>();//глобальная бд договоров
+        public List<StrategyBranch> StrategyBranches { get; set; } = new List<StrategyBranch>();
 
-        public Dictionary<string, DogovorLine> DogovorLines { get; set; } = new Dictionary<string, DogovorLine>();
+        //public Dictionary<string, DogovorLine> DogovorLines { get; set; } = new Dictionary<string, DogovorLine>();
         //public Dictionary<DogovorLine, DogovorLineState> States { get; set; } = new Dictionary<DogovorLine, DogovorLineState>(); //Срез состояний
-        public List<Eventt> Events { get; set; } = new List<Eventt>();
-        public List<Correction> Corrections=new List<Correction>();
+        //public List<Eventt> Events { get; set; } = new List<Eventt>();
         public DateTime PeriodStart { get; set; }
         public DateTime PeriodEnd { get; set; }
-        public DatedEventtStateScope InitDatedScope { get; set; }
-        public EventtState InitialEventtState { get; set; }
+        //public DatedEventtStateScope InitDatedScope { get; set; }
+        //public EventtState InitialEventtState { get; set; }
+    }
+
+    public class StrategyBranch
+    {
+        public EventtState LastEventState { get; set; }
+        public Dictionary<string, DogovorLine> DogovorLines { get; set; } = new Dictionary<string, DogovorLine>();
+        public List<Eventt> Events { get; set; } = new List<Eventt>();
+        public List<Correction> Corrections = new List<Correction>();
+
+        public string Error { get; set; }
+
+        public StrategyBranch Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class Correction
@@ -58,13 +73,13 @@ namespace FinansPlan2.New
                 context.Events.Add(eventtt);
             }*/
 
-            context.PeriodStart = context.Events.Min(x => x.Dat);
+            /*context.PeriodStart = context.Events.Min(x => x.Dat);
             context.PeriodEnd = context.Events.Max(x => x.Dat).AddDays(5);
 
             //ProcessPeriod(context);
 
             Eventt neweventt = null, beforeEventt = null;
-            InsertEvent(context, neweventt, beforeEventt);
+            InsertEvent(context, neweventt, beforeEventt);*/
 
             /*  var eventt = new Eventt() { Name = a.Name };
 
@@ -74,7 +89,7 @@ namespace FinansPlan2.New
   */
         }
 
-        private void InsertEvent(Contextt context, Eventt eventt, Eventt beforeEventt)
+       /* private void InsertEvent(Contextt context, Eventt eventt, Eventt beforeEventt)
         {
             var dayEvents = context.Events.Where(x => x.Dat == beforeEventt.Dat).OrderBy(x => x.OrderId).ToList();
             eventt.OrderId = beforeEventt.OrderId;
@@ -83,7 +98,7 @@ namespace FinansPlan2.New
 
             context.Events.Insert(context.Events.IndexOf(beforeEventt), eventt);
             //TODO add to db + submit OrderId change 
-        }
+        }*/
 
        
 
@@ -130,7 +145,23 @@ namespace FinansPlan2.New
     public class EventtState
     {
         public Eventt Eventtt { get; set; }
-        public EventtState Prev { get; set; }
+
+        private EventtState _prev;
+        public EventtState Prev
+        {
+            get => _prev;
+            set
+            {
+                if (value != null)
+                {
+                    value.Nexts.Add(this);
+                }
+
+                _prev = value;
+            }
+        }
+
+        public List<EventtState> Nexts { get; set; } = new List<EventtState>();
 
         public Dictionary<string, IDogovorLineState> DogovorLineStates; //Срез состояний после отработки события
 
@@ -138,7 +169,7 @@ namespace FinansPlan2.New
         {
             DogovorLineStates = Prev?.DogovorLineStates?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, IDogovorLineState>();
 
-            var canResponses = Eventtt.ActionItems.Select(x => x.CanExecute(request.Context, request.DayEvents, request.NewAutoEventStates, DogovorLineStates)).ToList();
+            var canResponses = Eventtt.ActionItems.Select(x => x.CanExecute(request.Context, request.DayEvents, request.NewAutoEventStates, DogovorLineStates,request.strategyBranch)).ToList();
 
             if (canResponses.Count == 1) return canResponses[0];
             else
@@ -166,7 +197,7 @@ namespace FinansPlan2.New
 
             foreach (var ai in Eventtt.ActionItems)
             {
-                ai.Execute(request.Context, request.DayEvents, request.NewAutoEventStates, DogovorLineStates);
+                ai.Execute(request.Context, request.DayEvents, request.NewAutoEventStates, DogovorLineStates,request.strategyBranch);
             }
         }
     }
@@ -174,6 +205,7 @@ namespace FinansPlan2.New
     public class EventExecuteRequest
     {
         public Contextt Context { get; set; }
+public StrategyBranch strategyBranch { get; set; }
         public List<Eventt> DayEvents { get; set; }
         public List<EventtState> NewAutoEventStates { get; set; }
     }
@@ -238,6 +270,7 @@ namespace FinansPlan2.New
     public class ExecuteRequest
     {
         public Contextt context;
+        public StrategyBranch strategyBranch;
         public string itemDogovorLineName;
         public IActionnItemParams paramss;
         public Eventt eventtt;
@@ -297,13 +330,17 @@ namespace FinansPlan2.New
         {
         }*/
 
-       /**/ public List<Eventt> GetAvailableEvents(DogovorLine d1, List<DogovorLine> dd)
+       public static List<Eventt> GetAvailableEvents(DogovorLine d1, List<DogovorLine> dd, bool? forManualAddOnly , bool? ForAutoGenAddOnly)
         {
             //Dogovor dog1 = new Dogovor(); Dogovor dog2 = new Dogovor();
             //List<Dogovor> dd = new List<Dogovor> { dog1, dog2 };
             var ret = new List<Eventt>();
 
-            var availableOps = Operation.Operations.Where(x => x.AvailableD1Types.Contains(d1.Dogovorr.Typee) && x.CanRunForManualGen);
+            var availableOps = Operation.Operations
+                .Where(x => x.AvailableD1Types.Contains(d1.Dogovorr.Typee) 
+                            && (!forManualAddOnly .HasValue || forManualAddOnly ==x.CanAddForManual)
+                            && (!ForAutoGenAddOnly.HasValue || ForAutoGenAddOnly == x.CanAddForAutoGen)
+            );
 
             foreach (var a in availableOps)
             {
@@ -328,7 +365,7 @@ namespace FinansPlan2.New
                             {
                                 var maxSum = Math.Min(can1.MaxSum, can2.MaxSum);
                                 //TODO try execute
-                                var eventt = new Eventt() { Name = a.Name };
+                                var eventt = new Eventt() { Name = a.Name,OpType=a.Typ };
                                 eventt.ActionItems = new List<ActionnItem>();
                                 eventt.ActionItems.Add(new ActionnItem { DogovorLineName = d1.LineName, ItemAction = a.ActionForD1.Value, Sum = maxSum });
                                 eventt.ActionItems.Add(new ActionnItem { DogovorLineName = d2.LineName, ItemAction = a.ActionForD2.Value, Sum = maxSum });
@@ -345,7 +382,7 @@ namespace FinansPlan2.New
                     CanResponse can1 =   new CanResponse(); //a1.CanExecute(d1, null, sum);
                     if (can1.Success)
                     {
-                        var eventt = new Eventt() { Name = a.Name };
+                        var eventt = new Eventt() { Name = a.Name,OpType=a.Typ };
                         eventt.ActionItems = new List<ActionnItem>();
                         eventt.ActionItems.Add(new ActionnItem { DogovorLineName = d1.LineName, ItemAction = a.ActionForD1.Value, Sum = sum });
                         ret.Add(eventt);
@@ -449,9 +486,9 @@ namespace FinansPlan2.New
         public IActionnItemParams Params { get; set; }
         public Eventt Eventtt { get; set; }
 
-        public CanResponse CanExecute(Contextt context, List<Eventt> dayEvents, List<EventtState> newAutoEventStates, Dictionary<string, IDogovorLineState> dogovorLineStates)
+        public CanResponse CanExecute(Contextt context, List<Eventt> dayEvents, List<EventtState> newAutoEventStates, Dictionary<string, IDogovorLineState> dogovorLineStates, StrategyBranch strategyBranch)
         {
-            var dogovor = DogovorName != null ? context.Dogovors[DogovorName] : context.DogovorLines[DogovorLineName].Dogovorr;
+            var dogovor = DogovorName != null ? context.Dogovors[DogovorName] : strategyBranch.DogovorLines[DogovorLineName].Dogovorr;
 
             return
                   dogovor.AvailableActions.Single(x => x.Type == ItemAction)
@@ -468,12 +505,12 @@ namespace FinansPlan2.New
                   });
         }
 
-        public void Execute(Contextt context, List<Eventt> dayEvents, List<EventtState> newAutoEventStates, Dictionary<string, IDogovorLineState> dogovorLineStates)
+        public void Execute(Contextt context, List<Eventt> dayEvents, List<EventtState> newAutoEventStates, Dictionary<string, IDogovorLineState> dogovorLineStates, StrategyBranch strategyBranch)
         {
-            var dogovor = DogovorName != null ? context.Dogovors[DogovorName] : context.DogovorLines[DogovorLineName].Dogovorr;
+            var dogovor = DogovorName != null ? context.Dogovors[DogovorName] : strategyBranch.DogovorLines[DogovorLineName].Dogovorr;
             
             dogovor.AvailableActions.Single(x => x.Type == ItemAction)
-            .Execute(new ExecuteRequest { context = context,
+            .Execute(new ExecuteRequest { context = context, strategyBranch=strategyBranch,
                 DogovorName = DogovorName,
                 itemDogovorLineName = DogovorLineName,
                 eventtt = Eventtt, paramss = Params, DogovorLinesStates = dogovorLineStates,
@@ -508,7 +545,7 @@ namespace FinansPlan2.New
         public int OrderId { get; set; }
 
         public bool IsPlaced { get; set; }
-
+        public OpType? OpType { get; internal set; }
     }
 
     public class DummyDayStartActionn : IActionn
