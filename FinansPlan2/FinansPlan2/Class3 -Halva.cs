@@ -226,7 +226,7 @@ namespace FinansPlan2.New
 
                 if (newState.ProcentsNakopl > 0 || correction != null)
                 {
-                    decimal sum = newState.ProcentsNakopl;
+                    decimal sum =Math.Round( newState.ProcentsNakopl,2);
                     decimal? sumBeforeCorrection = null;
                     if (correction != null)
                     {

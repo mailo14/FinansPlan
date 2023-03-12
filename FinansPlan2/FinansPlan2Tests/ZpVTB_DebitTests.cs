@@ -224,7 +224,7 @@ namespace FinansPlan2.Tests
 
             //context.InitialEventtState.DogovorLineStates
         }
-     
+
         [Test()]
         public void SnyatCashPopolnitFromCashTest()
         {
@@ -243,7 +243,7 @@ namespace FinansPlan2.Tests
                 Eventtt = event1,
                 DogovorName = vtbDebit.Name,
                 ItemAction = ActionnType.Open,
-                Params = new OpenDogovorParams { LineName = StandardDogLineName.ZpVtbKarta,Sum=300 }
+                Params = new OpenDogovorParams { LineName = StandardDogLineName.ZpVtbKarta, Sum = 300 }
             });
             context.StrategyBranches.Single().Events.Add(event1);
 
@@ -282,6 +282,80 @@ namespace FinansPlan2.Tests
             Processor.ProcessPeriod(context);
 
             //context.InitialEventtState.DogovorLineStates
+        }
+
+        [Test()]
+        public void HalvaProcentTest()
+        {
+            var context = new Contextt();
+            context.StrategyBranches.Add(new StrategyBranch());
+
+            var halva = new HalvaDogovor();
+            context.Dogovors.Add(halva.Name, halva);
+
+            var cashWallet = new CashWalletDogovor();
+            context.Dogovors.Add(cashWallet.Name, cashWallet);
+
+            var event1 = new Eventt { Dat = DateTime.Parse("27.04.2020"), Name = "Добавить халву" };
+            event1.ActionItems.Add(new ActionnItem
+            {
+                Eventtt = event1,
+                DogovorName = halva.Name,
+                ItemAction = ActionnType.Open,
+                Params = new OpenDogovorParams{  Sum = 177710.92m,ProcentOnOst=6.5m}
+            });
+            context.StrategyBranches.Single().Events.Add(event1);
+
+            event1 = new Eventt { Dat = DateTime.Parse("27.04.2020"), Name = "Добавить кошелек" };
+            event1.ActionItems.Add(new ActionnItem
+            {
+                Eventtt = event1,
+                DogovorName = cashWallet.Name,
+                ItemAction = ActionnType.Open,
+                Params = new OpenDogovorParams { Sum = 1000000 }
+            });
+            context.StrategyBranches.Single().Events.Add(event1);
+
+            var arr = new[] {
+                ("27.04.2020", -94682.89m),
+                ("28.04.2020", -1845.23m),
+                ("29.04.2020", 14869.58m),
+                ("30.04.2020", 74900.89m),
+                ("01.05.2020", 136819.63m),
+                ("02.05.2020", -100m),
+                ("03.05.2020", -1050m),
+                ("04.05.2020", -976.72m),
+                ("11.05.2020", -549m),
+                ("12.05.2020", -425.41m),
+                ("13.05.2020", 51990m),
+                ("16.05.2020", -1502.3m),
+                ("19.05.2020", -520.71m),
+                ("20.05.2020", 8847.31m),
+                ("21.05.2020", -23177.91m),
+                ("22.05.2020", -1000m),
+                ("23.05.2020", -1720.81m),
+                ("26.05.2020", -6508.77m),
+            };
+            foreach (var op in arr)
+            {
+                event1 = New.Operation.BuidEvent(new BuidEventFromOpRequest
+                {
+                    OpTyp = op.Item2 > 0 ? OpType.PopolnitFromCash : OpType.SnyatCash,
+                    Dat = DateTime.Parse(op.Item1),
+                    DogLine1Id = StandardDogLineName.Halva,
+                    Summ = Math.Abs(op.Item2)
+                });
+                context.StrategyBranches.Single().Events.Add(event1);
+            }
+
+            context.PeriodStart = context.StrategyBranches.Single().Events.Min(x => x.Dat);
+            context.PeriodEnd = context.StrategyBranches.Single().Events.Max(x => x.Dat)
+                .AddDays(1);
+
+            Processor.ProcessPeriod(context);
+
+            var halvaState= context.StrategyBranches.Single().LastEventState.DogovorLineStates[StandardDogLineName.Halva] as HalvaDogovorLineState;
+            Assert.AreEqual(332673.32m, halvaState.Sum);
         }
 
     }

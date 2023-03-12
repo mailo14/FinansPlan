@@ -78,6 +78,7 @@ namespace FinansPlan2.New
             new PopolnitFromCashOperation(),
             new PayZpOperation(),
             new PayProcentsOperation(),
+            new PayCashbackOperation(),
             /*new  Operation{Name="Перевод", 
                 AvailableD1Types=new List<DogovorType>{DogovorType.Karta },AvailableD2Types=new List<DogovorType>{DogovorType.Karta }            ,
                 ActionForD1=ActionnType.GetBeznal,ActionForD2=ActionnType.PutBeznal},
@@ -185,6 +186,25 @@ namespace FinansPlan2.New
         public override OperationCanExecuteResponse CanExecute(OperationCanExecuteRequest req)
         {
             var zpAccLines = req.strategyBranch.DogovorLines.Values.Where(l => l.LineName == StandardDogLineName.Halva || l.Dogovorr.Typee == DogovorType.Vklad)
+                .Select(x => x.LineName).ToList();
+
+            return new OperationCanExecuteResponse { Success = zpAccLines.Contains(req.DogLine1Id) };
+        }
+    }
+    public class PayCashbackOperation : Operation
+    {
+        public PayCashbackOperation()
+        {
+            Name = "Выплата кэшбека";
+            Typ = OpType.PayCashback;
+            ActionForD1 = ActionnType.PutBeznal;
+
+            CanAddForAutoGen = false;
+            CanAddForManual = false;
+        }
+        public override OperationCanExecuteResponse CanExecute(OperationCanExecuteRequest req)
+        {
+            var zpAccLines = req.strategyBranch.DogovorLines.Values.Where(l => l.LineName != StandardDogLineName.CashWallet)
                 .Select(x => x.LineName).ToList();
 
             return new OperationCanExecuteResponse { Success = zpAccLines.Contains(req.DogLine1Id) };

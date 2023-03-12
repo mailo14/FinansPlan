@@ -433,6 +433,7 @@ public StrategyBranch strategyBranch { get; set; }
     {
         PayZp,
         PayProcents,
+        PayCashback,
 
         Perevod,
 
